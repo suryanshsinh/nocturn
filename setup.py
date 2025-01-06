@@ -5,9 +5,10 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        "mnemonic==0.20",
-        "eth-account==0.6.0",
-        "solana==0.23.0",
+        "mnemonic",
+        "eth-account",
+        "web3",
+        "bip32utils"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
