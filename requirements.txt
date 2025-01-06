@@ -1,3 +1,4 @@
-mnemonic==0.20
-eth-account==0.6.0
-solana==0.23.0
+mnemonic
+eth-account
+web3
+bip32utils
