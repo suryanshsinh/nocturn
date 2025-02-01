@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="nocturn-wallet",
+    name="nocturn",
     version="1.0.0",
     author="Suryanshsinh Sisodiya",
     author_email="suryanshsinhsisodiya@gmail.com",
