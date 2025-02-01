@@ -1,8 +1,8 @@
 class InvalidMnemonicPhrase(Exception):
     pass
 
-class InvalidPrivateKey(Exception):
+class MismatchException(Exception):
     pass
 
-class MismatchException(Exception):
+class InvalidChain(Exception):
     pass

@@ -8,7 +8,8 @@ setup(
         "mnemonic",
         "eth-account",
         "web3",
-        "bip32utils"
+        "bip32utils",
+        "requests"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

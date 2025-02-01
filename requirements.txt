@@ -2,3 +2,4 @@ mnemonic
 eth-account
 web3
 bip32utils
+requests
