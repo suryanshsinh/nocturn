@@ -147,8 +147,8 @@ class Wallet:
             self.private_key = self._mnemonic_to_private_key(self.mnemonic)
             self.address = self._private_key_to_address(self.private_key)
     
-    def _generate_mnemonic(self):
-        return Mnemonic("english").generate(strength=256)
+    def _generate_mnemonic(self, words=12):
+        return Mnemonic("english").generate(strength=128 if words == 12 else 256)
     
     def _mnemonic_to_private_key(self, mnemonic):
         return BIP32Key.fromEntropy(Mnemonic("english").to_seed(mnemonic)).ChildKey(0).ChildKey(0).PrivateKey().hex()
