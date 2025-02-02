@@ -4,15 +4,6 @@ from mnemonic import Mnemonic
 from bip32utils import BIP32Key
 import requests
 
-class InvalidMnemonicPhrase(Exception):
-    pass
-
-class MismatchException(Exception):
-    pass
-
-class InvalidChain(Exception):
-    pass
-
 class Nocturn:
     def to_wei(amount):
         return Web3.to_wei(amount, "ether")
@@ -189,3 +180,12 @@ class Wallet:
         if chain not in ["eth", "bsc", "pol"]:
             raise InvalidChain("Invalid chain.")
         return Nocturn.preview_transaction(self.private_key, to_address, amount, self.RPC_ENDPOINTS["testnet" if testnet else "mainnet"][chain], gas_price)
+
+class InvalidMnemonicPhrase(Exception):
+    pass
+
+class MismatchException(Exception):
+    pass
+
+class InvalidChain(Exception):
+    pass
