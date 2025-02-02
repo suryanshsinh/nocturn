@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="nocturn",
-    version="1.0.0",
+    version="0.1.1",
     author="Suryanshsinh Sisodiya",
     author_email="suryanshsinhsisodiya@gmail.com",
     description="A Python-based lightweight crypto wallet for Ethereum, Binance Smart Chain, and Polygon.",

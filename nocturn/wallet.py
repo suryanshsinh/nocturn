@@ -2,8 +2,16 @@ from web3 import Web3
 from eth_account import Account
 from mnemonic import Mnemonic
 from bip32utils import BIP32Key
-from .exceptions import *
 import requests
+
+class InvalidMnemonicPhrase(Exception):
+    pass
+
+class MismatchException(Exception):
+    pass
+
+class InvalidChain(Exception):
+    pass
 
 class Nocturn:
     def to_wei(amount):
