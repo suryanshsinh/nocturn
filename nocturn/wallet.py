@@ -11,19 +11,29 @@ class Nocturn:
     def from_wei(amount):
         return Web3.from_wei(amount, "ether")
     
-    def to_currency(amount, currency="usd"):
-        url = f"https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies={currency}"
-        response = requests.get(url).json()
-        if "ethereum" not in response or currency not in response["ethereum"]:
-            return None
-        return amount * response["ethereum"][currency]
+    def get_price(API_KEY, chain, currency="usd"):
+        CHAIN_SYMBOLS = {
+            'eth': 'ETH', 'bsc': 'BNB', 'pol': 'MATIC'
+        }
+        if chain not in CHAIN_SYMBOLS:
+            raise InvalidChain("Invalid chain.")
+        url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest"
+        headers = {"X-CMC_PRO_API_KEY": API_KEY}
+        params = {"symbol": CHAIN_SYMBOLS[chain], "convert": currency.upper()}
+        response = requests.get(url, headers=headers, params=params).json()
+        try:
+            price = response["data"][CHAIN_SYMBOLS[chain]][0]["quote"][currency.upper()]["price"]
+            return float(price)
+        except KeyError:
+            raise Exception(f"Price data unavailable for {chain} in {currency}")
     
-    def from_currency(amount, currency="usd"):
-        url = f"https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies={currency}"
-        response = requests.get(url).json()
-        if "ethereum" not in response or currency not in response["ethereum"]:
-            return None
-        return amount / response["ethereum"][currency]
+    def to_currency(API_KEY, amount, chain, currency="usd"):
+        price = Nocturn.get_price(API_KEY, chain, currency)
+        return amount * price
+    
+    def from_currency(API_KEY, amount, chain, currency="usd"):
+        price = Nocturn.get_price(API_KEY, chain, currency)
+        return amount / price
     
     def fetch_balance(address, rpc_endpoint):
         web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
