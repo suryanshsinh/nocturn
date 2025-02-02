@@ -2,7 +2,7 @@ from web3 import Web3
 from eth_account import Account
 from mnemonic import Mnemonic
 from bip32utils import BIP32Key
-from exceptions import *
+from .exceptions import *
 import requests
 
 class Nocturn:
