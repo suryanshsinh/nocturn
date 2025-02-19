@@ -11,7 +11,7 @@ class Nocturn:
     def from_wei(amount):
         return Web3.from_wei(amount, "ether")
     
-    def get_price(API_KEY, chains, currency="usd"):
+    def get_prices(API_KEY, chains, currency="usd"):
         CHAIN_SYMBOLS = {
             'eth': 'ETH', 'bsc': 'BNB', 'pol': 'MATIC'
         }
@@ -26,7 +26,6 @@ class Nocturn:
         params = {"symbol": symbols, "convert": currency.upper()}
         response = requests.get(url, headers=headers, params=params).json()
         try:
-            print(response)
             prices = {
                 chain: response["data"][CHAIN_SYMBOLS[chain]][0]["quote"][currency.upper()]["price"]
                 for chain in chains
@@ -36,11 +35,11 @@ class Nocturn:
             raise Exception(f"Price data unavailable for {chain} in {currency}")
     
     def to_currency(API_KEY, amount, chain, currency="usd"):
-        price = Nocturn.get_price(API_KEY, chain, currency)
+        price = Nocturn.get_price(API_KEY, [chain], currency)
         return amount * price
     
     def from_currency(API_KEY, amount, chain, currency="usd"):
-        price = Nocturn.get_price(API_KEY, chain, currency)
+        price = Nocturn.get_price(API_KEY, [chain], currency)
         return amount / price
     
     def fetch_balance(address, rpc_endpoint):
@@ -61,8 +60,7 @@ class Nocturn:
         url = f"https://api.etherscan.io/v2/api?chainid={chain_id}&module=account&action=txlist&address={address}&startblock=0&endblock=99999999&page={page}&offset=10&sort=desc&apikey={API_KEY}"
         response = requests.get(url).json()
         if "result" not in response or not isinstance(response["result"], list):
-            print(f"Error fetching {chain} transactions:", response.get("message", "Unknown error"))
-            return []
+            raise Exception(f"Error fetching {chain} transactions:", response.get("message", "Unknown error"))
         return response["result"]
 
     def send_crypto(private_key, to_address, amount, rpc_endpoint, gas_price=None):
@@ -109,22 +107,28 @@ class Nocturn:
         if not web3.is_address(to_address):
             raise ValueError("Invalid recipient address.")
         sender_address = web3.eth.account.from_key(private_key).address
-        nonce = web3.eth.get_transaction_count(sender_address)
         if gas_price is None:
             gas_price = web3.eth.gas_price
-        gas_limit = web3.eth.estimate_gas({"to": to_address, "from": sender_address, "value": amount})
+        try:
+            gas_limit = web3.eth.estimate_gas({"to": to_address, "from": sender_address, "value": amount})
+        except:
+            return {
+                "can_proceed": False,
+                "error": "Failed to estimate gas limit."
+            }
         balance = web3.eth.get_balance(sender_address)
-        total_cost = amount + (gas_limit * gas_price)
+        estimated_gas_fee = gas_limit * gas_price
+        amount_sending = amount - estimated_gas_fee
         return {
             "sender": sender_address,
             "recipient": to_address,
             "amount_to_send": amount,
             "gas_price": gas_price,
             "gas_limit": gas_limit,
-            "estimated_gas_fee": gas_limit * gas_price,
-            "total_cost": total_cost,
+            "estimated_gas_fee": estimated_gas_fee,
+            "amount_sending": amount_sending,
             "balance_available": balance,
-            "can_proceed": balance >= total_cost
+            "can_proceed": balance >= amount
         }
 
 class Wallet:
