@@ -11,19 +11,27 @@ class Nocturn:
     def from_wei(amount):
         return Web3.from_wei(amount, "ether")
     
-    def get_price(API_KEY, chain, currency="usd"):
+    def get_price(API_KEY, chains, currency="usd"):
         CHAIN_SYMBOLS = {
             'eth': 'ETH', 'bsc': 'BNB', 'pol': 'MATIC'
         }
-        if chain not in CHAIN_SYMBOLS:
-            raise InvalidChain("Invalid chain.")
+        if not chains:
+            raise ValueError("No chain specified.")
+        for chain in chains:
+            if chain not in CHAIN_SYMBOLS:
+                raise InvalidChain("Invalid chain.")
+        symbols = ",".join([CHAIN_SYMBOLS[chain] for chain in chains])
         url = f"https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest"
         headers = {"X-CMC_PRO_API_KEY": API_KEY}
-        params = {"symbol": CHAIN_SYMBOLS[chain], "convert": currency.upper()}
+        params = {"symbol": symbols, "convert": currency.upper()}
         response = requests.get(url, headers=headers, params=params).json()
         try:
-            price = response["data"][CHAIN_SYMBOLS[chain]][0]["quote"][currency.upper()]["price"]
-            return float(price)
+            print(response)
+            prices = {
+                chain: response["data"][CHAIN_SYMBOLS[chain]][0]["quote"][currency.upper()]["price"]
+                for chain in chains
+            }
+            return prices
         except KeyError:
             raise Exception(f"Price data unavailable for {chain} in {currency}")
     
