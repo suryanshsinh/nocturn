@@ -74,13 +74,13 @@ class Nocturn:
             gas_price = web3.eth.gas_price
         gas_limit = web3.eth.estimate_gas({"to": to_address, "from": sender_address, "value": amount})
         balance = web3.eth.get_balance(sender_address)
-        gas_fee_used = gas_limit * gas_price
-        total_cost = amount + gas_fee_used
-        if balance < total_cost:
-            raise ValueError(f"Insufficient balance. Required: {total_cost} Wei, Available: {balance} Wei")
+        estimated_gas_fee = gas_limit * gas_price
+        amount_sending = amount - estimated_gas_fee
+        if balance < amount:
+            raise ValueError(f"Insufficient balance. Required: {amount} Wei, Available: {balance} Wei")
         tx = {
             "to": to_address,
-            "value": amount,
+            "value": amount_sending,
             "gas": gas_limit,
             "gasPrice": gas_price,
             "nonce": nonce,
@@ -92,14 +92,15 @@ class Nocturn:
             "tx_hash": tx_hash.hex(),
             "from": sender_address,
             "to": to_address,
-            "amount_sent": amount,
-            "gas_limit": gas_limit,
+            "amount_to_send": amount,
             "gas_price": gas_price,
-            "gas_fee_used": gas_fee_used,
-            "total_cost": total_cost,
-            "balance_before_tx": balance,
-            "balance_after_tx": balance - total_cost
+            "gas_limit": gas_limit,
+            "estimated_gas_fee": estimated_gas_fee,
+            "amount_sending": amount_sending,
+            "balance_available": balance,
+            "can_proceed": balance >= amount
         }
+
 
     def preview_transaction(private_key, to_address, amount, rpc_endpoint, gas_price=None):
         web3 = Web3(Web3.HTTPProvider(rpc_endpoint))
